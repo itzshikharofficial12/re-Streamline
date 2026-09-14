@@ -1,0 +1,29 @@
+<svg width="1400" height="420" viewBox="0 0 1400 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1020"/>
+      <stop offset="55%" stop-color="#111b35"/>
+      <stop offset="100%" stop-color="#1b2b4d"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6ee7ff"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="420" rx="28" fill="url(#bg)"/>
+  <circle cx="1180" cy="70" r="190" fill="#6ee7ff" opacity=".06"/>
+  <circle cx="1260" cy="300" r="240" fill="#8b5cf6" opacity=".06"/>
+  <g opacity=".35" stroke="#8aa0c6" stroke-width="1">
+    <path d="M900 0V420M1000 0V420M1100 0V420M1200 0V420M1300 0V420"/>
+    <path d="M800 80H1400M800 180H1400M800 280H1400M800 380H1400"/>
+  </g>
+  <g transform="translate(90 105)">
+    <rect width="112" height="112" rx="28" fill="none" stroke="url(#accent)" stroke-width="8"/>
+    <path d="M30 54h52M30 76h34" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="84" cy="76" r="7" fill="#6ee7ff"/>
+  </g>
+  <text x="240" y="155" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="76" font-weight="750" fill="#ffffff">StreamLine</text>
+  <text x="245" y="215" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="27" fill="#b9c7df">Open-source live video streaming infrastructure</text>
+  <rect x="245" y="252" width="330" height="7" rx="4" fill="url(#accent)"/>
+  <text x="245" y="305" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="19" fill="#8fa4c5">Broadcast • Process • Deliver • Interact • Analyze</text>
+</svg>

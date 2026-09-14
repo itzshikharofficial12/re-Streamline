@@ -1,0 +1,59 @@
+<svg width="1400" height="760" viewBox="0 0 1400 760" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="760" rx="24" fill="#0b1020"/>
+  <text x="700" y="55" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" fill="#fff">StreamLine — High-Level Architecture</text>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" text-anchor="middle">
+    <rect x="70" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="175" y="158" font-size="21" font-weight="700" fill="#fff">Creator / OBS</text>
+    <text x="175" y="187" font-size="16" fill="#a9b8d0">RTMP</text>
+
+    <rect x="350" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="455" y="158" font-size="21" font-weight="700" fill="#fff">MediaMTX</text>
+    <text x="455" y="187" font-size="16" fill="#a9b8d0">Ingestion</text>
+
+    <rect x="630" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="735" y="158" font-size="21" font-weight="700" fill="#fff">FFmpeg</text>
+    <text x="735" y="187" font-size="16" fill="#a9b8d0">Transcoding</text>
+
+    <rect x="910" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="1015" y="158" font-size="21" font-weight="700" fill="#fff">HLS / Storage</text>
+    <text x="1015" y="187" font-size="16" fill="#a9b8d0">MinIO / S3</text>
+
+    <rect x="1190" y="120" width="140" height="90" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="1260" y="158" font-size="20" font-weight="700" fill="#fff">Viewer</text>
+    <text x="1260" y="187" font-size="16" fill="#a9b8d0">hls.js</text>
+
+    <rect x="260" y="360" width="250" height="120" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="385" y="402" font-size="22" font-weight="700" fill="#fff">Next.js Web</text>
+    <text x="385" y="432" font-size="16" fill="#a9b8d0">Viewer + Creator UI</text>
+    <text x="385" y="456" font-size="16" fill="#a9b8d0">Discovery + Dashboard</text>
+
+    <rect x="575" y="360" width="250" height="120" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="700" y="402" font-size="22" font-weight="700" fill="#fff">API</text>
+    <text x="700" y="432" font-size="16" fill="#a9b8d0">Auth + Streams</text>
+    <text x="700" y="456" font-size="16" fill="#a9b8d0">Core application domains</text>
+
+    <rect x="890" y="360" width="250" height="120" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="1015" y="402" font-size="22" font-weight="700" fill="#fff">Realtime</text>
+    <text x="1015" y="432" font-size="16" fill="#a9b8d0">Socket.io + Redis</text>
+    <text x="1015" y="456" font-size="16" fill="#a9b8d0">Chat + Presence</text>
+
+    <rect x="430" y="585" width="250" height="100" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="555" y="625" font-size="21" font-weight="700" fill="#fff">PostgreSQL</text>
+    <text x="555" y="653" font-size="16" fill="#a9b8d0">Prisma</text>
+
+    <rect x="720" y="585" width="250" height="100" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="845" y="625" font-size="21" font-weight="700" fill="#fff">Analytics</text>
+    <text x="845" y="653" font-size="16" fill="#a9b8d0">Events + Aggregation</text>
+  </g>
+
+  <g stroke="#91a4c7" stroke-width="3" fill="none" stroke-linecap="round">
+    <path d="M280 165H350"/><path d="M560 165H630"/><path d="M840 165H910"/><path d="M1120 165H1190"/>
+    <path d="M385 360V270"/><path d="M700 360V270"/>
+    <path d="M700 480V585"/><path d="M385 480L520 585"/>
+    <path d="M1015 480L845 585"/><path d="M890 420H825"/>
+  </g>
+  <g fill="#91a4c7">
+    <circle cx="315" cy="165" r="5"/><circle cx="595" cy="165" r="5"/><circle cx="875" cy="165" r="5"/><circle cx="1155" cy="165" r="5"/>
+  </g>
+</svg>
