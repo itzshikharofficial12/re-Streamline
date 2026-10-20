@@ -72,26 +72,32 @@ StreamLine is being built to demonstrate a production-quality streaming architec
 
 ### Core streaming path
 
+Broadcasting in StreamLine is browser-based via our own Creator Studio. **OBS is not required** to broadcast (external software like OBS publishing via RTMP is supported only as an optional secondary ingest path).
+
 ```text
-Creator / OBS
+Browser Creator Studio
+(getUserMedia: camera/mic; planned getDisplayMedia: screen)
       │
-      │ RTMP
-      ▼
-  MediaMTX
+      ├── WebRTC Signaling (SDP/ICE via API/MediaMTX) [Session negotiation only]
       │
-      ▼
-   FFmpeg
+      ▼ WebRTC Media Publishing (SRTP)
+  MediaMTX (Ingest & Routing Gateway)
+      │
+      ▼ Internal Media Route
+   FFmpeg (Transcoding when required)
       │
       ├── High quality
       ├── Medium quality
       └── Low quality
       │
       ▼
- HLS / Object Storage
+ HLS / Object Storage (MinIO / S3)
       │
-      ▼
- Browser + hls.js
+      ▼ HTTP Delivery
+ Browser Viewer (hls.js + HTML5 <video>)
 ```
+
+> **Signaling Note:** WebRTC signaling negotiates the connection parameters (SDP offer/answer and ICE candidate exchange) between the Creator Studio and the ingestion server. Signaling is control plane communication, not the video stream itself. Audio and video flow over dedicated SRTP media channels once negotiated.
 
 ### Application path
 
@@ -122,10 +128,10 @@ Creator / OBS
 
 | Component | Responsibility |
 |---|---|
-| `apps/web` | Next.js web application, viewer experience, creator dashboard |
-| `apps/api` | Core API and application/domain logic |
-| `services/media/ingest` | Stream ingestion and MediaMTX integration |
-| `services/media/transcoder` | FFmpeg processing and multi-quality HLS |
+| `apps/web` | Next.js web application, browser Creator Studio (`getUserMedia`), viewer experience (`hls.js`), creator dashboard |
+| `apps/api` | Core API, signaling negotiation, and application/domain logic |
+| `services/media/ingest` | WebRTC stream ingestion and MediaMTX routing (optional RTMP) |
+| `services/media/transcoder` | FFmpeg processing and multi-quality HLS transcoding when required |
 | `services/media/recorder` | Recording and VOD processing |
 | `services/realtime` | Socket.io, WebSockets, chat and presence |
 | `services/analytics` | Viewing and engagement analytics |
@@ -145,8 +151,10 @@ The initial architecture is built around:
 ### Web & Application
 
 - **Next.js**
+- **React**
 - **TypeScript**
 - **Node.js**
+- **Browser Media APIs (`getUserMedia()`, planned `getDisplayMedia()`)**
 
 ### Data
 
@@ -156,10 +164,11 @@ The initial architecture is built around:
 
 ### Media
 
+- **WebRTC (WHIP / WHEP)**
 - **MediaMTX**
 - **FFmpeg**
 - **HLS**
-- **hls.js**
+- **hls.js (HTML5 Video)**
 - **MinIO / S3-compatible storage**
 
 ### Realtime
@@ -188,7 +197,7 @@ streamline/
 │
 ├── services/
 │   ├── media/
-│   │   ├── ingest/             # RTMP / MediaMTX
+│   │   ├── ingest/             # WebRTC / MediaMTX (optional RTMP)
 │   │   ├── transcoder/         # FFmpeg / HLS
 │   │   └── recorder/           # Recording / VOD
 │   ├── realtime/               # Socket.io / chat / presence
@@ -272,15 +281,15 @@ hls.js
 The core Phase 2 unlock is:
 
 ```text
-OBS
+Browser Creator Studio (getUserMedia)
+ ↓ [WebRTC + Signaling]
+MediaMTX (Ingest & Routing)
  ↓
-MediaMTX
+FFmpeg (when required)
  ↓
-FFmpeg
+HLS (.m3u8 + segments)
  ↓
-HLS
- ↓
-Browser
+Viewer Browser (hls.js)
 ```
 
 ---
@@ -357,6 +366,7 @@ The repository treats documentation as part of the engineering deliverable.
 | [`docs/architecture/SYSTEM_FLOWS.md`](docs/architecture/SYSTEM_FLOWS.md) | System and data flows |
 | [`docs/development/DEVELOPMENT.md`](docs/development/DEVELOPMENT.md) | Development practices |
 | [`docs/development/GIT_WORKFLOW.md`](docs/development/GIT_WORKFLOW.md) | Branches, commits and PRs |
+| [`docs/development/CHANGELOG.md`](docs/development/CHANGELOG.md) | Permanent development change log |
 | [`docs/api/API_GUIDELINES.md`](docs/api/API_GUIDELINES.md) | API conventions |
 | [`docs/database/DATABASE.md`](docs/database/DATABASE.md) | Database guidelines |
 | [`docs/streaming/STREAMING.md`](docs/streaming/STREAMING.md) | Media and streaming architecture |
@@ -507,14 +517,15 @@ Prefer focused PRs over massive changes that are difficult to review.
 
 ### Phase 2 — Live Ingest
 
-- [ ] MediaMTX
-- [ ] RTMP from OBS
-- [ ] FFmpeg worker pipeline
-- [ ] HLS output
+- [ ] MediaMTX WebRTC & routing setup
+- [ ] Browser Creator Studio camera & mic capture (`getUserMedia()`)
+- [ ] WebRTC publishing & signaling integration
+- [ ] FFmpeg worker pipeline for ABR HLS output
 - [ ] MinIO integration
-- [ ] Stream key generation
-- [ ] Stream page playback
-- [ ] End-to-end OBS → browser flow
+- [ ] Stream key & token generation
+- [ ] Stream page playback (`hls.js`)
+- [ ] End-to-end browser Creator Studio → viewer flow
+- [ ] Optional external RTMP publishing (e.g., OBS)
 
 ### Phase 3 — Viewer & Creator
 

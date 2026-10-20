@@ -97,3 +97,21 @@ packages/
 ├── validation/
 ├── ui/
 └── utils/
+```
+
+---
+
+### Rule 4 — Mandatory change logging
+
+Every developer and AI agent working on this repository MUST maintain [`docs/development/CHANGELOG.md`](docs/development/CHANGELOG.md).
+
+Before and after every meaningful task:
+
+1. **Read before working:** Read [`docs/development/CHANGELOG.md`](docs/development/CHANGELOG.md) before starting any meaningful implementation task to understand recent changes, active decisions, and known risks.
+2. **Update upon completion:** Append a new entry to the change log immediately after meaningful changes have actually been made.
+3. **Link architectural decisions:** Explicitly record any architectural decisions and cite their associated ADR file paths under `docs/decisions/`.
+4. **Report files and validation honestly:** Explicitly list all affected repository files and document real command outputs and validation results (passed, failed, or not run, with precise reasons).
+5. **Acknowledge blockers and incomplete work:** Document known limitations, risks, and unfinished items candidly rather than marking tasks complete prematurely.
+6. **No fabricated status:** Never invent changes, test executions, commit hashes, mock outputs, or production readiness status.
+7. **Reverse chronological order:** Place the newest entry at the top under `## Change Entries`, following the standard schema in the change log.
+8. **Log in the same task:** Update the change log within the exact same pull request / task as the implementation itself — do not defer logging to later cleanup tasks.

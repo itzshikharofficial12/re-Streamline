@@ -22,25 +22,34 @@ This should be proven before full application integration.
 
 ## Phase 2 End-to-End Pipeline
 
-The expected flow is:
+StreamLine's core publishing model is browser-native: **OBS is not required**.
+
+The primary live streaming pipeline is:
 
 ```text
-OBS
- |
-RTMP
- |
-MediaMTX
- |
-FFmpeg Worker
- |
-HLS
- |
-MinIO / S3-compatible storage
- |
-Stream page
- |
-hls.js
+Browser Creator Studio
+  │ • Audio/video capture via navigator.mediaDevices.getUserMedia()
+  │ • Screen capture planned via navigator.mediaDevices.getDisplayMedia()
+  │
+  ├── 1. WebRTC Signaling (SDP Offer/Answer + ICE via API / MediaMTX WHIP)
+  │      [Negotiates the WebRTC session — signaling is NOT the video stream]
+  │
+  ▼ 2. WebRTC Media Stream (SRTP audio/video tracks)
+MediaMTX Ingest & Routing Gateway
+  │
+  ▼ 3. Stream Routing
+FFmpeg Transcoder Worker (when required for multi-bitrate ABR)
+  │
+  ▼ 4. HLS Packaging (.m3u8 playlists + .ts/.m4s media segments)
+MinIO / S3-compatible Object Storage & HTTP Delivery Cache
+  │
+  ▼ 5. HTTP Segment Requests
+Stream Viewing Page (hls.js + HTML5 <video> element)
 ```
+
+### Optional External Publishing (OBS / RTMP)
+
+Creators wishing to stream from desktop applications or dedicated hardware encoders may optionally publish via RTMP to MediaMTX using their generated stream key. This is an optional secondary ingestion method and is not a prerequisite for broadcasting.
 
 ## Reliability Considerations
 

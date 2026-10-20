@@ -1,59 +1,109 @@
 <svg width="1400" height="760" viewBox="0 0 1400 760" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#17233d"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
   <rect width="1400" height="760" rx="24" fill="#0b1020"/>
-  <text x="700" y="55" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" fill="#fff">StreamLine — High-Level Architecture</text>
+  <text x="700" y="55" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#ffffff">StreamLine — High-Level Architecture</text>
+  <text x="700" y="82" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="500" fill="#6ee7ff">Primary Browser Creator Studio (WebRTC) → MediaMTX → FFmpeg → HLS Delivery</text>
 
   <g font-family="Inter,Segoe UI,Arial,sans-serif" text-anchor="middle">
-    <rect x="70" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
-    <text x="175" y="158" font-size="21" font-weight="700" fill="#fff">Creator / OBS</text>
-    <text x="175" y="187" font-size="16" fill="#a9b8d0">RTMP</text>
+    <!-- Box 1: Creator Studio -->
+    <rect x="60" y="115" width="230" height="100" rx="18" fill="url(#cardGrad)" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="175" y="148" font-size="18" font-weight="700" fill="#ffffff">Creator Studio (Web)</text>
+    <text x="175" y="172" font-size="13" fill="#a9b8d0">getUserMedia() [Cam/Mic]</text>
+    <text x="175" y="194" font-size="11" fill="#6ee7ff">Planned: getDisplayMedia()</text>
 
-    <rect x="350" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
-    <text x="455" y="158" font-size="21" font-weight="700" fill="#fff">MediaMTX</text>
-    <text x="455" y="187" font-size="16" fill="#a9b8d0">Ingestion</text>
+    <!-- Box 2: MediaMTX -->
+    <rect x="350" y="115" width="220" height="100" rx="18" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="460" y="152" font-size="20" font-weight="700" fill="#ffffff">MediaMTX</text>
+    <text x="460" y="177" font-size="14" fill="#a9b8d0">Ingest &amp; Routing Gateway</text>
+    <text x="460" y="197" font-size="11" fill="#a9b8d0">WebRTC (WHIP) / Optional RTMP</text>
 
-    <rect x="630" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
-    <text x="735" y="158" font-size="21" font-weight="700" fill="#fff">FFmpeg</text>
-    <text x="735" y="187" font-size="16" fill="#a9b8d0">Transcoding</text>
+    <!-- Box 3: FFmpeg -->
+    <rect x="630" y="115" width="220" height="100" rx="18" fill="url(#cardGrad)" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="740" y="152" font-size="20" font-weight="700" fill="#ffffff">FFmpeg</text>
+    <text x="740" y="177" font-size="14" fill="#a9b8d0">Transcoding (when required)</text>
+    <text x="740" y="197" font-size="11" fill="#6ee7ff">Multi-rendition ABR (H.264/AAC)</text>
 
-    <rect x="910" y="120" width="210" height="90" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
-    <text x="1015" y="158" font-size="21" font-weight="700" fill="#fff">HLS / Storage</text>
-    <text x="1015" y="187" font-size="16" fill="#a9b8d0">MinIO / S3</text>
+    <!-- Box 4: HLS / Storage -->
+    <rect x="910" y="115" width="220" height="100" rx="18" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="1020" y="152" font-size="20" font-weight="700" fill="#ffffff">HLS / Object Storage</text>
+    <text x="1020" y="177" font-size="14" fill="#a9b8d0">MinIO / S3 Storage</text>
+    <text x="1020" y="197" font-size="11" fill="#a9b8d0">.m3u8 Playlists + Media Segments</text>
 
-    <rect x="1190" y="120" width="140" height="90" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
-    <text x="1260" y="158" font-size="20" font-weight="700" fill="#fff">Viewer</text>
-    <text x="1260" y="187" font-size="16" fill="#a9b8d0">hls.js</text>
+    <!-- Box 5: Viewer -->
+    <rect x="1190" y="115" width="150" height="100" rx="18" fill="url(#cardGrad)" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="1265" y="152" font-size="19" font-weight="700" fill="#ffffff">Viewer</text>
+    <text x="1265" y="177" font-size="13" fill="#a9b8d0">hls.js Playback</text>
+    <text x="1265" y="197" font-size="11" fill="#6ee7ff">HTML5 &lt;video&gt;</text>
 
-    <rect x="260" y="360" width="250" height="120" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
-    <text x="385" y="402" font-size="22" font-weight="700" fill="#fff">Next.js Web</text>
-    <text x="385" y="432" font-size="16" fill="#a9b8d0">Viewer + Creator UI</text>
-    <text x="385" y="456" font-size="16" fill="#a9b8d0">Discovery + Dashboard</text>
+    <!-- Mid Row 1: Next.js Web -->
+    <rect x="250" y="360" width="260" height="120" rx="18" fill="url(#cardGrad)" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="380" y="402" font-size="21" font-weight="700" fill="#ffffff">Next.js Web (apps/web)</text>
+    <text x="380" y="430" font-size="14" fill="#a9b8d0">Browser Creator Studio &amp; UI</text>
+    <text x="380" y="454" font-size="13" fill="#a9b8d0">Viewer Experience &amp; Discovery</text>
 
-    <rect x="575" y="360" width="250" height="120" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
-    <text x="700" y="402" font-size="22" font-weight="700" fill="#fff">API</text>
-    <text x="700" y="432" font-size="16" fill="#a9b8d0">Auth + Streams</text>
-    <text x="700" y="456" font-size="16" fill="#a9b8d0">Core application domains</text>
+    <!-- Mid Row 2: API -->
+    <rect x="575" y="360" width="260" height="120" rx="18" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="705" y="402" font-size="21" font-weight="700" fill="#ffffff">API (apps/api)</text>
+    <text x="705" y="428" font-size="14" fill="#a9b8d0">Signaling, Auth &amp; Stream Tokens</text>
+    <text x="705" y="452" font-size="13" fill="#a9b8d0">Core Domain Services</text>
 
-    <rect x="890" y="360" width="250" height="120" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
-    <text x="1015" y="402" font-size="22" font-weight="700" fill="#fff">Realtime</text>
-    <text x="1015" y="432" font-size="16" fill="#a9b8d0">Socket.io + Redis</text>
-    <text x="1015" y="456" font-size="16" fill="#a9b8d0">Chat + Presence</text>
+    <!-- Mid Row 3: Realtime -->
+    <rect x="900" y="360" width="250" height="120" rx="18" fill="url(#cardGrad)" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="1025" y="402" font-size="21" font-weight="700" fill="#ffffff">Realtime (services/realtime)</text>
+    <text x="1025" y="430" font-size="14" fill="#a9b8d0">Socket.io + Redis Pub/Sub</text>
+    <text x="1025" y="454" font-size="13" fill="#a9b8d0">Live Chat &amp; Presence</text>
 
-    <rect x="430" y="585" width="250" height="100" rx="18" fill="#17233d" stroke="#8b5cf6" stroke-width="2"/>
-    <text x="555" y="625" font-size="21" font-weight="700" fill="#fff">PostgreSQL</text>
-    <text x="555" y="653" font-size="16" fill="#a9b8d0">Prisma</text>
+    <!-- Bottom Row: PostgreSQL -->
+    <rect x="430" y="585" width="250" height="100" rx="18" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="555" y="625" font-size="21" font-weight="700" fill="#ffffff">PostgreSQL</text>
+    <text x="555" y="653" font-size="14" fill="#a9b8d0">Prisma (packages/database)</text>
 
-    <rect x="720" y="585" width="250" height="100" rx="18" fill="#17233d" stroke="#6ee7ff" stroke-width="2"/>
-    <text x="845" y="625" font-size="21" font-weight="700" fill="#fff">Analytics</text>
-    <text x="845" y="653" font-size="16" fill="#a9b8d0">Events + Aggregation</text>
+    <!-- Bottom Row: Analytics -->
+    <rect x="720" y="585" width="250" height="100" rx="18" fill="url(#cardGrad)" stroke="#6ee7ff" stroke-width="2"/>
+    <text x="845" y="625" font-size="21" font-weight="700" fill="#ffffff">Analytics</text>
+    <text x="845" y="653" font-size="14" fill="#a9b8d0">Events &amp; Aggregations</text>
   </g>
 
-  <g stroke="#91a4c7" stroke-width="3" fill="none" stroke-linecap="round">
-    <path d="M280 165H350"/><path d="M560 165H630"/><path d="M840 165H910"/><path d="M1120 165H1190"/>
-    <path d="M385 360V270"/><path d="M700 360V270"/>
-    <path d="M700 480V585"/><path d="M385 480L520 585"/>
-    <path d="M1015 480L845 585"/><path d="M890 420H825"/>
+  <!-- Flow Arrows / Connectors -->
+  <g stroke="#91a4c7" stroke-width="2.5" fill="none" stroke-linecap="round">
+    <!-- Stream Pipeline Connectors -->
+    <path d="M290 165H350"/>
+    <path d="M570 165H630"/>
+    <path d="M850 165H910"/>
+    <path d="M1130 165H1190"/>
+
+    <!-- App to Pipeline Connectors (Signaling & Playback) -->
+    <path d="M380 360V250H175V215" stroke-dasharray="4,4"/>
+    <path d="M705 360V270H460V215" stroke-dasharray="4,4"/>
+    <path d="M1020 215V280H1265V215"/>
+
+    <!-- Database / Analytics Connectors -->
+    <path d="M705 480V585"/>
+    <path d="M380 480L500 585"/>
+    <path d="M1025 480L845 585"/>
+    <path d="M900 420H835"/>
   </g>
-  <g fill="#91a4c7">
-    <circle cx="315" cy="165" r="5"/><circle cx="595" cy="165" r="5"/><circle cx="875" cy="165" r="5"/><circle cx="1155" cy="165" r="5"/>
+
+  <!-- Connector Dots -->
+  <g fill="#6ee7ff">
+    <circle cx="320" cy="165" r="4.5"/>
+    <circle cx="600" cy="165" r="4.5"/>
+    <circle cx="880" cy="165" r="4.5"/>
+    <circle cx="1160" cy="165" r="4.5"/>
+  </g>
+
+  <!-- Labels on Connectors -->
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="11" fill="#6ee7ff" text-anchor="middle">
+    <text x="320" y="155">WebRTC</text>
+    <text x="600" y="155">Route</text>
+    <text x="880" y="155">HLS</text>
+    <text x="1160" y="155">HTTP</text>
+    <text x="280" y="242">Signaling (SDP/ICE)</text>
   </g>
 </svg>

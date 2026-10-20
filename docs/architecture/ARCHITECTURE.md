@@ -22,23 +22,30 @@ The architecture should support future scale without prematurely introducing unn
 
 ## Streaming Path
 
-The expected conceptual media path is:
+StreamLine is designed so that broadcasting occurs directly through our browser-based Creator Studio. **OBS is not required** for creators to broadcast; external software publishing (e.g., OBS via RTMP) is supported solely as an optional secondary ingest path.
+
+The primary media pipeline is:
 
 ```text
-OBS / Creator
-     |
-    RTMP
-     |
-  MediaMTX
-     |
-  FFmpeg
-     |
- Multi-quality HLS
-     |
-Object Storage / Delivery
-     |
-Browser + hls.js
+Browser Creator Studio
+  │ (getUserMedia: camera/mic; planned getDisplayMedia: screen)
+  │
+  ├── WebRTC Signaling (SDP/ICE via API/MediaMTX) [Session negotiation only]
+  │
+  ▼ WebRTC Media Publishing (SRTP/UDP/TCP)
+MediaMTX (Ingest & Routing Gateway)
+  │
+  ▼ Internal Media Route
+FFmpeg (Processing & Transcoding when required)
+  │
+  ▼ Multi-quality ABR HLS (.m3u8 playlists & media segments)
+Object Storage / Delivery (MinIO / S3)
+  │
+  ▼ HTTP Delivery
+Viewer Page (hls.js + HTML5 <video> Element)
 ```
+
+> **Signaling Note:** WebRTC signaling negotiates the peer connection session (exchanging SDP offers/answers and ICE network candidates) between the browser and the ingestion gateway. Signaling is control plane coordination, not the video stream itself. Once the connection is established, video and audio flow directly over secure media transport.
 
 ## Application Responsibilities
 
@@ -46,9 +53,10 @@ Browser + hls.js
 
 Owns user-facing experiences:
 
+- browser-based Creator Studio (camera/mic capture via `getUserMedia()`, planned screen share via `getDisplayMedia()`, WebRTC publishing)
 - authentication UI
 - stream discovery
-- stream viewing
+- stream viewing (`hls.js` + HTML5 video)
 - creator dashboard
 - chat UI
 - moderation UI
@@ -60,8 +68,9 @@ Owns user-facing experiences:
 Owns core application/business operations:
 
 - users
-- authentication
-- streams
+- authentication & authorization
+- stream session negotiation & WebRTC signaling coordination
+- streams & stream keys
 - follows
 - discovery metadata
 - moderation
@@ -73,9 +82,9 @@ Owns core application/business operations:
 
 Own media infrastructure:
 
-- ingestion
-- transcoding
-- recording/VOD
+- `ingest`: WebRTC ingestion & routing via MediaMTX (with optional RTMP fallback)
+- `transcoder`: FFmpeg processing and adaptive multi-quality HLS packaging when required
+- `recorder`: recording and VOD packaging
 
 ### Realtime
 
