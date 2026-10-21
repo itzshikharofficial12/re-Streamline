@@ -13,6 +13,8 @@ dist/
 build/
 out/
 .turbo/
+*.tsbuildinfo
+
 
 # Logs
 logs/

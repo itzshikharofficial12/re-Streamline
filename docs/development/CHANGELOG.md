@@ -14,6 +14,42 @@ This file records every meaningful technical and architectural change made to St
 
 ## Change Entries
 
+### 2026-10-21 — Milestone 1: Monorepo foundation and local infrastructure
+
+- **Type:** Infrastructure / Architecture / Feature
+- **Status:** Validated
+- **Reason:** Establish an executable, reproducible monorepo development foundation, independent minimal applications (`@streamline/web` and `@streamline/api`), shared configuration (`@streamline/config`) and type contracts (`@streamline/types`), root Docker Compose local infrastructure (PostgreSQL 16 and Redis 7 with healthchecks), and comprehensive developer documentation.
+- **Existing repository state:**
+  - Repository was an empty directory skeleton containing `.gitkeep` files in `apps/*`, `services/*`, and `packages/*`.
+  - Root `package.json` had scripts pointing to `turbo`, but no dependencies, no `pnpm-lock.yaml`, no TypeScript configs, and no `docker-compose.yml`.
+  - Applications could not run, build, typecheck, or lint.
+- **Changes made in this task:**
+  - Configured `@streamline/config` with base, Node, and Next.js `tsconfig` files.
+  - Configured `@streamline/types` with shared `HealthResponse` and `ApiResponse` interfaces.
+  - Built `@streamline/api` with Node.js, Express, TypeScript, and graceful shutdown exposing `GET /health` and `GET /`.
+  - Built `@streamline/web` with Next.js 14 App Router, providing a clean, accessible development status page and client-side API health check capability.
+  - Established root monorepo scripts (`build`, `dev`, `lint`, `typecheck`, `format`, `format:check`), root `.eslintrc.cjs`, `.prettierrc`, `.prettierignore`, and root `tsconfig.json`.
+  - Generated and verified `pnpm-lock.yaml` with resolved dependencies.
+  - Created root `docker-compose.yml` with PostgreSQL 16 Alpine and Redis 7 Alpine, explicit health checks, and persistent named volumes.
+  - Updated `.env.example` with local defaults for applications, Docker Compose, PostgreSQL, and Redis.
+  - Updated `docs/development/DEVELOPMENT.md` with full developer onboarding, infrastructure management, running, and check commands.
+- **Decisions and trade-offs:**
+  - Kept frontend UI minimal, clean, accessible, and focused on development status per project policy, deferring design polish until core platform functionality is established.
+  - Chose lightweight Express + `tsx` for `@streamline/api` to provide predictable Node.js/TypeScript execution without framework bloat.
+  - Omitted MediaMTX and MinIO from local Docker Compose for this milestone to keep infrastructure lean until streaming pipeline milestones.
+- **Validation:**
+  - `pnpm install`: Successfully resolved all 5 workspace projects, generated `pnpm-lock.yaml`.
+  - `pnpm run build`: Turborepo built `@streamline/types`, `@streamline/api`, and `@streamline/web` (Next.js production build) successfully (3/3 tasks passed in 5.65s).
+  - `pnpm run typecheck`: TypeScript compilation passed cleanly across all packages and apps (4/4 tasks passed in 852ms).
+  - `pnpm run lint`: ESLint passed across all packages and apps with 0 errors (4/4 tasks passed in 1.52s).
+  - `pnpm run format:check`: Prettier verified all repository files match code style.
+  - API Health Check: Started `@streamline/api` and verified `curl -s -i http://localhost:4000/health` returned HTTP 200 OK with valid `HealthResponse` JSON payload.
+  - Docker Compose: Executed `docker compose up -d`; verified both `streamline-postgres` and `streamline-redis` reached `(healthy)` status in `docker compose ps`. Verified PostgreSQL connectivity via `pg_isready` and Redis via `redis-cli ping` (returned `PONG`).
+- **Limitations / Risks:**
+  - Authentication, database migrations (Prisma schemas), and streaming pipeline components (WebRTC, MediaMTX, FFmpeg, HLS) are deliberately deferred to future milestones.
+- **Follow-up:**
+  - Milestone 2: Stream ingestion foundation and browser WebRTC Creator Studio publishing pipeline.
+
 ### 2026-10-20 — Establish permanent development change log and agent workflow rules
 
 - **Type:** Documentation / Process

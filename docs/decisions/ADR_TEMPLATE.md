@@ -30,19 +30,19 @@ Description and tradeoffs.
 
 ### Positive
 
-- 
+-
 
 ### Negative
 
-- 
+-
 
 ### Risks
 
-- 
+-
 
 ## Affected Components
 
-- 
+-
 
 ## Follow-up
 

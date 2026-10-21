@@ -13,6 +13,7 @@ Accepted (Architectural Direction — Implementation Unproven)
 Streamline is an open-source live video streaming infrastructure platform designed to support creator broadcasting, media ingestion, processing, delivery, and viewer interaction at scale.
 
 A critical design requirement is accessibility for creators:
+
 - The primary creator workflow **must work directly through our own browser-based Creator Studio**.
 - Broadcasters must **not be required to install or configure external software like OBS (Open Broadcaster Software)** to broadcast live.
 - Audio and video must be captured in-browser via standard Web APIs (`getUserMedia()` for camera and microphone, with `getDisplayMedia()` planned for screen sharing in an upcoming milestone).
@@ -20,6 +21,7 @@ A critical design requirement is accessibility for creators:
 - Conversely, downstream viewer delivery requires scaling cost-effectively to thousands or tens of thousands of concurrent viewers per stream without prohibitive media server or bandwidth costs.
 
 We must decide on:
+
 1. The primary ingest protocol from the browser Creator Studio to the media server.
 2. The role of session signaling versus raw media transport.
 3. The delivery protocol for viewers and playback architecture.
@@ -90,6 +92,7 @@ Viewer Browser (hls.js + HTML5 <video> Element)
 ## Consequences and Trade-offs
 
 ### Trade-offs & HLS Latency
+
 - **End-to-End Latency**: Unlike end-to-end WebRTC which achieves sub-second latency, standard HLS introduces a 2–6 second (or longer) glass-to-glass latency due to segment duration boundaries and player buffer requirements. For broadcast streaming with interactive chat, this latency is an acceptable industry standard tradeoff to achieve massive scale and low distribution cost.
 - **Transcoding Overhead**: WebRTC video codecs (VP8/VP9/H.264) and audio codecs (Opus) must be packaged or transcoded by FFmpeg into HLS-compliant formats (typically H.264/AAC), which consumes CPU/GPU resources on the media processing layer.
 - **Architectural Duality**: Operating WebRTC on ingest and HLS on egress requires managing two media paradigms (stateful peer connections on ingest, stateless chunked HTTP on distribution).
