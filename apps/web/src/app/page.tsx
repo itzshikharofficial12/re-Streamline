@@ -35,19 +35,73 @@ export default function HomePage() {
 
       <section className="card">
         <h2>Milestone Status</h2>
-        <p style={{ marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           <span className="badge">Milestone 1 — Monorepo Foundation</span>
-        </p>
+          <span className="badge">Milestone 2 — Secure JWT Authentication</span>
+        </div>
         <dl>
           <dt>Frontend App</dt>
           <dd>Next.js 14 / React 18 (@streamline/web)</dd>
           <dt>Backend API</dt>
           <dd>Node.js / Express (@streamline/api)</dd>
+          <dt>Authentication</dt>
+          <dd>Argon2id + JWT + Opaque Refresh Session</dd>
           <dt>Shared Packages</dt>
-          <dd>@streamline/config, @streamline/types</dd>
+          <dd>@streamline/auth, @streamline/database, @streamline/validation, @streamline/types</dd>
           <dt>Orchestration</dt>
           <dd>pnpm workspaces + Turborepo</dd>
         </dl>
+      </section>
+
+      <section className="card">
+        <h2>Authentication Experience (Milestone 2)</h2>
+        <p style={{ marginBottom: '1rem' }}>
+          Test user registration, secure login, cookie-based sessions, and the authenticated
+          dashboard.
+        </p>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <a
+            href="/signup"
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#38bdf8',
+              color: '#0b1020',
+              borderRadius: '4px',
+              fontWeight: 600,
+              textDecoration: 'none'
+            }}
+          >
+            Create Account (/signup)
+          </a>
+          <a
+            href="/login"
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: 'transparent',
+              color: '#f0f4fc',
+              border: '1px solid #233152',
+              borderRadius: '4px',
+              fontWeight: 500,
+              textDecoration: 'none'
+            }}
+          >
+            Sign In (/login)
+          </a>
+          <a
+            href="/dashboard"
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: 'transparent',
+              color: '#8ea1c0',
+              border: '1px solid #233152',
+              borderRadius: '4px',
+              fontWeight: 500,
+              textDecoration: 'none'
+            }}
+          >
+            View Dashboard (/dashboard)
+          </a>
+        </div>
       </section>
 
       <section className="card">

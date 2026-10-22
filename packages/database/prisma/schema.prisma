@@ -1,0 +1,39 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String           @id @default(uuid())
+  email           String           @unique
+  username        String           @unique
+  passwordHash    String           @map("password_hash")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  refreshSessions RefreshSession[]
+
+  @@map("users")
+}
+
+model RefreshSession {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hashedToken String    @unique @map("hashed_token")
+  familyId    String    @map("family_id")
+  expiresAt   DateTime  @map("expires_at")
+  revokedAt   DateTime? @map("revoked_at")
+  replacedBy  String?   @map("replaced_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  lastUsedAt  DateTime? @map("last_used_at")
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([hashedToken])
+  @@map("refresh_sessions")
+}

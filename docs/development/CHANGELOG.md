@@ -14,6 +14,74 @@ This file records every meaningful technical and architectural change made to St
 
 ## Change Entries
 
+### 2026-10-21 — Fix signup submit handler, native form fallback, and stale dev bundle
+
+- **Type:** Bug Fix / Testing / Frontend
+- **Status:** Validated
+- **Reason:** Resolve issue where submitting `/signup` cleared form fields without triggering an API request in Chrome DevTools Network.
+- **Root Cause Analysis:**
+  1. **Stale Client JS Chunks / Missing Hydration:** During prior milestone validation, running `next build` replaced `.next` with a production build while the long-running `next dev` server remained active. This caused the dev server to serve `404 Not Found` for client chunks (`app/signup/page.js`, `main-app.js`, `app-pages-internals.js`), preventing client-side React hydration from executing.
+  2. **Native Form Submission Fallback:** Because React hydration never occurred, the form's `onSubmit` React handler was never bound to the DOM. Clicking `<button type="submit">Create Account</button>` executed native browser HTML form submission, causing a full page reload (`GET /signup`) that reset all input states without dispatching a network call to `http://localhost:4000/auth/signup`.
+- **Changes made in this task:**
+  - **`apps/web/src/app/signup/page.tsx` & `apps/web/src/app/login/page.tsx`:**
+    - Added `action="javascript:void(0);"` to `<form>` elements to guarantee that even if JavaScript fails or is delayed, the browser will never execute a native GET page reload.
+    - Added explicit `name` attributes (`name="email"`, `name="username"`, `name="password"`, `name="confirmPassword"`) to all inputs for accessibility and standard form semantics.
+    - Added safe development-only diagnostic logging (`console.debug` and `console.error`) tracing submission start, client-side validation, API dispatch, and error handling without logging passwords or tokens.
+    - Preserved form inputs on client validation failures and API errors.
+  - **`apps/web/tests/signup.test.ts`:** Created 6 automated frontend unit and integration tests covering missing input validation, password length limits, password mismatch checks, valid input acceptance, live API client submission, and `ApiError` 409 duplicate handling.
+  - **`apps/web/package.json`:** Added `test` script and `tsx` devDependency.
+  - **Dev Server:** Restarted `next dev` server on port 3000 to resolve static chunk 404s and serve fresh development bundles. Verified `app/signup/page.js` chunk returns `200 OK`.
+- **Validation:**
+  - `pnpm --filter @streamline/web test`: 6/6 tests passed (validation logic + API submission).
+  - `pnpm test`: 31 tests passed across all 7 packages (13 in `@streamline/auth`, 12 in `@streamline/api`, 6 in `@streamline/web`).
+  - `pnpm run typecheck`: Passed across all 7 packages with 0 errors.
+  - `pnpm run lint`: Passed across all 7 packages with 0 errors.
+  - `pnpm run format:check`: Passed; all files match Prettier code style.
+  - Static Chunk Check: Verified `curl -I http://localhost:3000/_next/static/chunks/app/signup/page.js` returns `HTTP/1.1 200 OK`.
+
+### 2026-10-21 — Milestone 2: Secure JWT Authentication and Session Management
+
+- **Type:** Security / Feature / Architecture
+- **Status:** Validated
+- **Reason:** Implement end-to-end first-party email-and-password authentication with cryptographic security, short-lived JWT access tokens, opaque refresh sessions stored hashed in PostgreSQL, atomic refresh token rotation, token family reuse detection, HttpOnly cookies, defense-in-depth CSRF mitigation, and authenticated frontend pages (`/signup`, `/login`, `/dashboard`).
+- **Existing repository state:**
+  - Milestone 1 established monorepo foundation, Docker Compose (PostgreSQL 16, Redis 7), Next.js frontend, and Express API.
+  - No database models or migrations existed; no authentication, session management, or password hashing was present.
+- **Changes made in this task:**
+  - **`packages/validation` (`@streamline/validation`):** Created shared Zod validation schemas (`signupSchema`, `loginSchema`) and exported TypeScript types.
+  - **`packages/database` (`@streamline/database`):** Created Prisma schema with `User` and `RefreshSession` models, defined migration `20261021133325_init_auth`, generated Prisma Client, and exported singleton `prisma`. Resolved macOS port conflict with host PostgreSQL by mapping Docker Compose PostgreSQL to host port `5433`.
+  - **`packages/auth` (`@streamline/auth`):** Created Argon2id password hashing/verification, `jose` JWT signing/verification (`HS256`, strict validation of `sub`, `iss`, `aud`, `exp`, and `tokenPurpose === 'access'`), 64-byte opaque refresh token generation, and deterministic SHA-256 token hashing.
+  - **`packages/types` (`@streamline/types`):** Added `SafeUser` and `AuthResponse` type definitions.
+  - **`apps/api` (`@streamline/api`):**
+    - `src/config/env.ts`: Centralized environment configuration with validation for JWT secrets, token lifetimes, origins, and cookie settings.
+    - `src/middleware/auth.ts`: Implemented `requireAuth` middleware extracting tokens from HttpOnly cookies or Bearer headers, validating claims, and verifying active DB user records.
+    - `src/middleware/csrf.ts`: Implemented defense-in-depth CSRF protection enforcing allowed `Origin`/`Referer` and custom `X-Requested-With` header verification.
+    - `src/middleware/rateLimit.ts`: Implemented sliding-window rate limiters for sensitive auth routes.
+    - `src/modules/auth`: Implemented `AuthService`, `AuthController`, and `createAuthRouter` for `POST /auth/signup`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, and `GET /auth/me`.
+    - Implemented atomic refresh token rotation and token-family reuse detection (immediately revokes all active sessions in the family upon reuse of an already-rotated token).
+  - **`apps/web` (`@streamline/web`):**
+    - `src/lib/api.ts`: Implemented resilient client fetcher with `credentials: 'include'`, CSRF headers, and automatic token refresh interception on 401 without redirect loops.
+    - Created accessible, responsive UI pages at `/signup`, `/login`, and `/dashboard` (loading actual user profile from `/auth/me` with working logout).
+    - Updated home page with Milestone 2 status and navigation links.
+  - **Tests (`packages/auth/src/index.test.ts` & `apps/api/tests/auth.test.ts`):** Added 25 automated unit and integration tests covering password hashing, JWT claims, token verification, rotation, reuse detection, logout, and CSRF defense.
+  - **Documentation:** Created `docs/architecture/authentication.md` covering architecture, token design, security considerations, and developer runbooks.
+- **Decisions and trade-offs:**
+  - Selected opaque refresh tokens stored as SHA-256 hashes in PostgreSQL instead of JWT refresh tokens to maintain instant server-side revocation and family reuse detection.
+  - Chose `HttpOnly`, `SameSite=Lax` cookies for browser credential transport to prevent token theft via XSS, paired with `X-Requested-With` headers and origin validation for CSRF defense.
+  - Mapped Docker Compose PostgreSQL to port `5433` to prevent collision with native macOS PostgreSQL on port `5432`.
+- **Validation:**
+  - `pnpm test`: Ran unit tests (`@streamline/auth`, 13 tests) and integration tests (`@streamline/api`, 12 tests) via Turborepo; all 25 tests passed in 2.19s with 0 failures.
+  - `pnpm run typecheck`: TypeScript compilation passed cleanly across all 7 workspace packages.
+  - `pnpm run lint`: ESLint passed across all 7 workspace packages with 0 errors.
+  - `pnpm run format:check`: Verified all repository files match Prettier code style.
+  - `pnpm run build`: Verified successful production builds for `@streamline/web` (Next.js App Router static/dynamic pages) and `@streamline/api`.
+  - Manual verification via `curl`: Verified signup, login, cookie issuance, token rotation, reuse detection triggering family revocation, logout cookie clearing, and protected `/auth/me`.
+- **Limitations / Risks:**
+  - Self-service password recovery, email verification, and MFA/TOTP are not yet implemented.
+  - Distributed rate limiting via Redis is planned for high-throughput scaling; current rate limiting uses an in-memory sliding window.
+- **Follow-up:**
+  - Milestone 3: Stream ingestion foundation, Creator Studio WebRTC publishing, and MediaMTX integration.
+
 ### 2026-10-21 — Milestone 1: Monorepo foundation and local infrastructure
 
 - **Type:** Infrastructure / Architecture / Feature
