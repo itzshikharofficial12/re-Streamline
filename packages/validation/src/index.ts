@@ -15,9 +15,10 @@ export const passwordSchema = z
  */
 export const emailSchema = z
   .string()
+  .trim()
+  .toLowerCase()
   .email('Invalid email address')
-  .max(255, 'Email cannot exceed 255 characters')
-  .transform((val) => val.trim().toLowerCase());
+  .max(255, 'Email cannot exceed 255 characters');
 
 /**
  * Username schema (optional profile handle for creators/viewers)
@@ -49,3 +50,13 @@ export const loginSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
+
+/**
+ * Waitlist request validation
+ */
+export const waitlistSchema = z.object({
+  email: emailSchema,
+  source: z.string().max(50).optional()
+});
+
+export type WaitlistInput = z.infer<typeof waitlistSchema>;

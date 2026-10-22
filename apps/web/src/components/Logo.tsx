@@ -1,0 +1,114 @@
+import React from 'react';
+
+export interface LogoProps {
+  /**
+   * 'icon' renders only the flowing-S symbol.
+   * 'full' renders the flowing-S symbol followed by the 'streamline' wordmark.
+   */
+  variant?: 'icon' | 'full';
+  /**
+   * Custom height/size of the logo in pixels. Default is 28.
+   */
+  size?: number;
+  /**
+   * Additional CSS classes.
+   */
+  className?: string;
+  /**
+   * Whether to include the link home when rendered as a logo component.
+   */
+  ariaLabel?: string;
+}
+
+export function StreamlineSymbol({
+  size = 28,
+  className = ''
+}: {
+  size?: number;
+  className?: string;
+}) {
+  // Aspect ratio of the flowing-S symbol: 388 x 253 (approx 1.53 : 1)
+  const width = Math.round(size * 1.533);
+  const height = size;
+
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 388 253"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+    >
+      <defs>
+        <linearGradient id="streamline-flowing-s" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00E5FF" />
+          <stop offset="55%" stopColor="#00C49F" />
+          <stop offset="100%" stopColor="#10B981" />
+        </linearGradient>
+      </defs>
+      {/* Top flowing ribbon */}
+      <path
+        d="M 77.0 1.0 L 161.0 1.0 L 161.0 3.0 L 139.0 45.0 L 75.0 47.0 L 62.0 54.0 L 52.0 65.0 L 47.0 80.0 L 49.0 96.0 L 53.0 104.0 L 62.0 113.0 L 75.0 120.0 L 94.0 120.0 L 108.0 114.0 L 122.0 105.0 L 178.0 53.0 L 211.0 27.0 L 239.0 12.0 L 263.0 4.0 L 283.0 1.0 L 304.0 1.0 L 324.0 4.0 L 356.0 14.0 L 358.0 16.0 L 358.0 60.0 L 357.0 61.0 L 349.0 56.0 L 330.0 49.0 L 313.0 46.0 L 292.0 45.0 L 269.0 50.0 L 250.0 58.0 L 228.0 72.0 L 155.0 135.0 L 126.0 155.0 L 103.0 164.0 L 92.0 166.0 L 75.0 166.0 L 64.0 164.0 L 39.0 153.0 L 19.0 135.0 L 9.0 120.0 L 4.0 107.0 L 2.0 100.0 L 1.0 80.0 L 2.0 68.0 L 6.0 55.0 L 11.0 44.0 L 20.0 31.0 L 41.0 13.0 L 62.0 4.0 L 76.0 2.0 Z"
+        fill="url(#streamline-flowing-s)"
+      />
+      {/* Bottom flowing ribbon (180° symmetric counterpart) */}
+      <path
+        d="M 299.0 87.0 L 323.0 89.0 L 345.0 98.0 L 360.0 109.0 L 377.0 130.0 L 385.0 150.0 L 386.0 178.0 L 381.0 199.0 L 366.0 223.0 L 347.0 239.0 L 333.0 246.0 L 319.0 250.0 L 303.0 252.0 L 228.0 252.0 L 229.0 247.0 L 250.0 208.0 L 310.0 207.0 L 326.0 200.0 L 336.0 189.0 L 341.0 178.0 L 341.0 160.0 L 337.0 151.0 L 323.0 137.0 L 315.0 133.0 L 302.0 131.0 L 285.0 136.0 L 270.0 145.0 L 188.0 218.0 L 167.0 232.0 L 139.0 245.0 L 106.0 252.0 L 84.0 252.0 L 55.0 247.0 L 53.0 245.0 L 48.0 245.0 L 46.0 243.0 L 34.0 240.0 L 30.0 237.0 L 30.0 192.0 L 59.0 204.0 L 86.0 208.0 L 109.0 206.0 L 122.0 202.0 L 147.0 190.0 L 163.0 179.0 L 198.0 150.0 L 227.0 123.0 L 251.0 105.0 L 279.0 91.0 L 298.0 88.0 Z"
+        fill="url(#streamline-flowing-s)"
+      />
+    </svg>
+  );
+}
+
+export function Logo({
+  variant = 'full',
+  size = 28,
+  className = '',
+  ariaLabel = 'Streamline'
+}: LogoProps) {
+  if (variant === 'icon') {
+    return (
+      <span className={`inline-flex items-center ${className}`} aria-label={ariaLabel} role="img">
+        <StreamlineSymbol size={size} />
+      </span>
+    );
+  }
+
+  // Calculate typography scale proportional to symbol size
+  const fontSize = Math.round(size * 0.78);
+
+  return (
+    <span
+      className={`streamline-logo ${className}`}
+      aria-label={ariaLabel}
+      role="img"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: `${Math.max(8, Math.round(size * 0.38))}px`,
+        textDecoration: 'none',
+        userSelect: 'none'
+      }}
+    >
+      <StreamlineSymbol size={size} />
+      <span
+        className="streamline-wordmark"
+        style={{
+          fontFamily: "var(--font-sans), 'Inter', sans-serif",
+          fontWeight: 600,
+          fontSize: `${fontSize}px`,
+          letterSpacing: '-0.025em',
+          color: '#FFFFFF',
+          lineHeight: 1
+        }}
+      >
+        streamline
+      </span>
+    </span>
+  );
+}
+
+export default Logo;

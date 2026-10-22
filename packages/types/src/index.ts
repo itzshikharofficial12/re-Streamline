@@ -41,3 +41,19 @@ export interface SafeUser {
 export interface AuthResponse {
   user: SafeUser;
 }
+
+/**
+ * Waitlist Entry Response
+ */
+export interface WaitlistEntry {
+  id: string;
+  email: string;
+  status: string;
+  source: string;
+  createdAt: string;
+}
+
+export interface WaitlistResponse {
+  entry: WaitlistEntry;
+  alreadyRegistered?: boolean;
+}

@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main>
+      <main className="container">
         <header>
           <h1>Streamline Dashboard</h1>
           <p>Loading authenticated profile...</p>
@@ -69,7 +69,7 @@ export default function DashboardPage() {
 
   if (error || !user) {
     return (
-      <main>
+      <main className="container">
         <header>
           <h1>Streamline Dashboard</h1>
           <p>Session could not be established</p>
@@ -87,7 +87,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main>
+    <main className="container">
       <header
         style={{
           display: 'flex',

@@ -5,6 +5,7 @@ import type { HealthResponse } from '@streamline/types';
 import { config } from './config/env.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { createAuthRouter } from './modules/auth/auth.routes.js';
+import { createWaitlistRouter } from './modules/waitlist/waitlist.routes.js';
 
 export function createApp(): express.Application {
   const app = express();
@@ -32,7 +33,8 @@ export function createApp(): express.Application {
       status: 'operational',
       endpoints: {
         health: '/health',
-        auth: '/auth'
+        auth: '/auth',
+        waitlist: '/waitlist'
       }
     });
   });
@@ -48,8 +50,10 @@ export function createApp(): express.Application {
     });
   });
 
-  // Mount Auth Router
+  // Mount Routers
   app.use('/auth', createAuthRouter());
+  app.use('/waitlist', createWaitlistRouter());
+  app.use('/api/waitlist', createWaitlistRouter());
 
   return app;
 }

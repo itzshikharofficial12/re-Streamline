@@ -60,7 +60,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main>
+    <main className="container">
       <header>
         <h1>Streamline — Sign In</h1>
         <p>Access your live broadcasting and account settings</p>

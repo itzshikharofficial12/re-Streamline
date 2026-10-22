@@ -87,7 +87,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main>
+    <main className="container">
       <header>
         <h1>Streamline — Create Account</h1>
         <p>Register as a creator or viewer on Streamline</p>

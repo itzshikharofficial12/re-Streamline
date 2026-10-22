@@ -14,6 +14,87 @@ This file records every meaningful technical and architectural change made to St
 
 ## Change Entries
 
+### 2026-10-22 — Implement Streamline waitlist end-to-end (Database, API, and Homepage integration)
+
+- **Type:** Feature / Database / API / Frontend
+- **Status:** Validated
+- **Reason:** Implement a production-grade, end-to-end waitlist collection feature directly within the existing architecture, including Prisma model and migration in `@streamline/database`, server-side validation and rate limiting in `apps/api`, and live reactive state handling in the homepage hero form in `apps/web`.
+- **Changes made in this task:**
+  - **`packages/database/prisma/schema.prisma`:** Created dedicated `WaitlistEntry` model with UUID `id`, `@unique` normalized `email`, `status` (default `'pending'`), `source` (default `'homepage'`), `createdAt` (`created_at`), and `updatedAt` (`updated_at`), mapped to table `waitlist_entries`.
+  - **`packages/database/prisma/migrations/20261022073321_add_waitlist/migration.sql`:** Generated and applied non-destructive PostgreSQL migration creating the `waitlist_entries` table and unique constraint index on `email`. Verified no existing tables or data were altered.
+  - **`packages/validation/src/index.ts`:** Added `waitlistSchema` and `WaitlistInput`, configuring `emailSchema` with `.trim().toLowerCase().email().max(255)` so surrounding whitespace is normalized before format validation.
+  - **`packages/types/src/index.ts`:** Exported `WaitlistEntry` and `WaitlistResponse` contracts.
+  - **`apps/api/src/modules/waitlist/`:** Implemented waitlist domain module:
+    - `waitlist.service.ts`: Handles email normalization, initial existence lookup, Prisma persistence, and catches concurrent `P2002` unique-constraint conflicts, throwing `WaitlistConflictError`.
+    - `waitlist.controller.ts`: Validates payload schema, responds with HTTP 201 on creation, maps conflict errors to HTTP 409 (`ALREADY_REGISTERED`), maps validation errors to HTTP 400 (`VALIDATION_ERROR`), and logs internal errors safely without leaking internals (HTTP 500).
+    - `waitlist.routes.ts`: Protects submissions with IP-based rate limiting (20 requests per 15 min window) using existing `createRateLimiter`.
+  - **`apps/api/src/app.ts`:** Mounted public endpoints at `/waitlist` and `/api/waitlist`.
+  - **`apps/web/src/lib/api.ts`:** Added `api.waitlist.join({ email, source })` client method communicating with the backend API with CORS and CSRF credentials.
+  - **`apps/web/src/components/Hero.tsx`:** Integrated live API submission and all 5 required user-facing states:
+    - *State A (Success):* Renders "You're on the list!" with "We'll let you know when Streamline is ready." upon confirmed database persistence.
+    - *State B (Duplicate):* Renders "You're already on the list." based on API HTTP 409 conflict response.
+    - *State C (Server/Network Error):* Renders "Something went wrong. Please try again." keeping the input populated and button re-enabled for retry.
+    - *State D (Invalid email):* Inline client-side validation message without submitting.
+    - *State E (Loading):* Button transitions to "Joining...", preventing duplicate clicks.
+  - **`apps/web/src/app/globals.css`:** Added styling for waitlist status cards, icons, typography, and retry controls matching the `#050505` space aesthetic.
+  - **Testing Suites:**
+    - `apps/api/tests/waitlist.test.ts`: Created 6 integration tests verifying 201 creation, 409 duplicate rejection, case/whitespace normalization, 400 validation rejection, empty payload rejection, and `/api/waitlist` routing.
+    - `apps/web/tests/waitlist.test.ts`: Created 6 frontend tests verifying client email validation, live API client submission, duplicate error handling (409), and server/network error fallback states.
+- **Validation:**
+  - `pnpm test`: All 42 tests passed across all 7 monorepo packages (13 in `@streamline/auth`, 18 in `@streamline/api`, 11 in `@streamline/web`).
+  - `pnpm run typecheck`: Passed with 0 errors across all 7 packages.
+  - `pnpm run lint`: Passed with 0 errors across all 7 packages.
+  - `pnpm run format:check`: Passed; all files match Prettier code style.
+  - `pnpm --filter @streamline/web build` & `pnpm --filter @streamline/api build`: Both production bundles compiled successfully.
+  - Live Database Verification: Tested end-to-end HTTP POST to `http://localhost:4000/waitlist`, confirmed single row insert in PostgreSQL, verified duplicate attempt returned HTTP 409 with count remaining 1, and verified invalid input returned HTTP 400.
+  - Auth Verification: Confirmed existing login and signup endpoints continue to operate normally.
+
+### 2026-10-22 — Implement Streamline final development homepage and design system
+
+- **Type:** Feature / Frontend / Design
+- **Status:** Validated
+- **Reason:** Implement the approved final development homepage design for Streamline directly inside the existing Next.js web application (`apps/web`), reproducing the full-screen cinematic space atmosphere, flowing-S dual-ribbon brand symbol, Inter typography, status badge, hero copy, waitlist area, and responsive layout without disturbing existing authentication routes or backend contracts.
+- **Changes made in this task:**
+  - **`apps/web/src/components/Logo.tsx`:** Created reusable vector SVG logo component with 180° mathematically symmetric flowing-S dual-ribbon symbol with cyan-to-teal linear gradient (`#00E5FF` -> `#10B981`) and crisp lowercase `streamline` Inter SemiBold wordmark. Supports `variant="icon"` and `variant="full"`.
+  - **`apps/web/public/favicon.svg`:** Created SVG favicon source matching the flowing-S symbol.
+  - **`apps/web/src/components/Header.tsx`:** Created responsive navigation header with brand link on the left, and `About` link, `Log in` link (`/login`), and `Sign up` white pill button (`/signup`) on the right, aligned on a common horizontal baseline.
+  - **`apps/web/src/components/Footer.tsx`:** Created restrained footer with copyright notice `© 2026 Streamline. All rights reserved.` and tagline `Built for creators.`, aligned to page margins.
+  - **`apps/web/src/components/SpaceBackground.tsx`:** Implemented deep-space visual atmosphere with near-black `#050505` background, subtle deterministic star field, two prominent diffraction-spike cross stars matching the reference design, and the photorealistic curved planetary Earth horizon with atmospheric cyan-blue glow (`#22D3EE`).
+  - **`apps/web/public/horizon.png`:** Created clean, optimized, text-free planetary horizon asset derived from the reference design, with top edge blending into the space canvas.
+  - **`apps/web/src/components/Hero.tsx`:** Implemented centered hero section featuring the `IN DEVELOPMENT` status pill with cyan glowing dot, bold responsive headline (`The future of streaming is being built.`), supporting copy, and accessible waitlist form with email input, `Get notified` button, client-side validation, and transparent preview notification (acknowledging that waitlist registrations will open with the Creator Beta release without fabricating backend database records or localStorage).
+  - **`apps/web/src/app/about/page.tsx`:** Created clean About destination page detailing Streamline's browser ingest, adaptive HLS, and community architecture so the header `About` link resolves to a valid, themed route.
+  - **`apps/web/src/app/page.tsx`:** Replaced preliminary development card placeholder with the final approved cinematic landing page composing `SpaceBackground`, `Header`, `Hero`, and `Footer`.
+  - **`apps/web/src/app/globals.css`:** Implemented complete CSS design system tokens, responsive landing layout styles, star flares, horizon glows, waitlist pill styling, and `prefers-reduced-motion` compliance, while preserving all existing `.container`, `.card`, and form styles for authentication and dashboard pages.
+  - **`apps/web/src/app/layout.tsx` & Auth Pages:** Integrated Next.js `Inter` font loading via `next/font/google`, moved `.container` scoping to `/login`, `/signup`, and `/dashboard` so the landing page renders edge-to-edge while auth and dashboard pages maintain their established layouts and styling.
+- **Validation:**
+  - `pnpm --filter @streamline/web typecheck`: Passed with 0 errors.
+  - `pnpm --filter @streamline/web lint`: Passed with 0 errors.
+  - `pnpm test`: All 31 tests passed across all 7 packages in the monorepo (`@streamline/auth`, `@streamline/api`, `@streamline/web`).
+  - `pnpm --filter @streamline/web build`: Completed successfully with all 8 routes (`/`, `/about`, `/login`, `/signup`, `/dashboard`, etc.) statically generated and optimized.
+  - Route HTTP Checks: Verified `curl http://localhost:3000/`, `/login`, `/signup`, and `/about` all return HTTP 200 OK.
+  - Authentication Safety: Confirmed existing `/login`, `/signup`, and `/dashboard` pages and API contracts remain intact and fully functional.
+
+### 2026-10-22 — Resolve PostgreSQL port collision with Postgres.app and repair Prisma connection
+
+- **Type:** Bug Fix / Infrastructure / Database
+- **Status:** Validated
+- **Reason:** Resolve issue where Prisma and API login returned HTTP 500 (`P1003: Database streamline does not exist`) because macOS loopback connections on port 5433 were intercepted by local Postgres.app (v18.6) rather than reaching the Docker PostgreSQL (v16.15) container.
+- **Root Cause Analysis:**
+  1. The host Mac was running Postgres.app v18 (PID 93833) bound to `localhost:5433` (IPv4 and IPv6) and Homebrew PostgreSQL v17 (PID 961) on port 5432.
+  2. Docker Compose was configured with `POSTGRES_PORT=5433`, bound to wildcard `0.0.0.0:5433`.
+  3. Under macOS socket resolution, specific host binds to `localhost`/`127.0.0.1:5433` take precedence over wildcard binds. Consequently, all host connections from Prisma and the API to `localhost:5433` routed to Postgres.app (where the `streamline` database did not exist) instead of Docker's container.
+- **Changes made in this task:**
+  - **Configuration:** Updated `POSTGRES_PORT=5434` and `DATABASE_URL=postgresql://postgres:postgres@localhost:5434/streamline?schema=public` in `.env` and `.env.example`, eliminating port collision with Postgres.app and removing trailing whitespace.
+  - **Docker Container:** Recreated the `streamline-postgres` container with port mapping `5434:5432` using `docker compose up -d postgres`. Preserved the named volume `streamline_postgres_data` without dropping data or recreating tables.
+  - **Prisma:** Verified `prisma migrate status` reported `Database schema is up to date!` with `1 migration found in prisma/migrations`. Regenerated Prisma Client via `pnpm --filter @streamline/database run prisma:generate`.
+  - **API Service:** Verified that `apps/api` automatically reloaded configuration, resolved the Docker database on port 5434, and successfully processed `POST /auth/login` (HTTP 200 OK) and `GET /auth/me`.
+- **Validation:**
+  - Host psql check: `PGPASSWORD=postgres psql -h 127.0.0.1 -p 5434 -U postgres -d streamline` confirmed `PostgreSQL 16.15` and `current_database: streamline`.
+  - Prisma check: `pnpm --filter @streamline/database exec prisma migrate status` passed with 0 drift.
+  - Test suite: `pnpm test -- --force` passed all 31 tests across all 7 packages (13 in `@streamline/auth`, 12 in `@streamline/api`, 6 in `@streamline/web`).
+  - API Health & Login: `GET /health` returned 200 OK; `POST /auth/login` returned 200 OK with valid user data and `HttpOnly` cookies.
+  - Monorepo hygiene: `pnpm run typecheck`, `pnpm run lint`, and `pnpm run format:check` all passed with 0 errors.
+
 ### 2026-10-21 — Fix signup submit handler, native form fallback, and stale dev bundle
 
 - **Type:** Bug Fix / Testing / Frontend
