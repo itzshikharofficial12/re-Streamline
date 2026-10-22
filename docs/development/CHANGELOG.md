@@ -14,6 +14,27 @@ This file records every meaningful technical and architectural change made to St
 
 ## Change Entries
 
+### 2026-10-22 — Resolve PostgreSQL port collision with Postgres.app and repair Prisma connection
+
+- **Type:** Bug Fix / Infrastructure / Database
+- **Status:** Validated
+- **Reason:** Resolve issue where Prisma and API login returned HTTP 500 (`P1003: Database streamline does not exist`) because macOS loopback connections on port 5433 were intercepted by local Postgres.app (v18.6) rather than reaching the Docker PostgreSQL (v16.15) container.
+- **Root Cause Analysis:**
+  1. The host Mac was running Postgres.app v18 (PID 93833) bound to `localhost:5433` (IPv4 and IPv6) and Homebrew PostgreSQL v17 (PID 961) on port 5432.
+  2. Docker Compose was configured with `POSTGRES_PORT=5433`, bound to wildcard `0.0.0.0:5433`.
+  3. Under macOS socket resolution, specific host binds to `localhost`/`127.0.0.1:5433` take precedence over wildcard binds. Consequently, all host connections from Prisma and the API to `localhost:5433` routed to Postgres.app (where the `streamline` database did not exist) instead of Docker's container.
+- **Changes made in this task:**
+  - **Configuration:** Updated `POSTGRES_PORT=5434` and `DATABASE_URL=postgresql://postgres:postgres@localhost:5434/streamline?schema=public` in `.env` and `.env.example`, eliminating port collision with Postgres.app and removing trailing whitespace.
+  - **Docker Container:** Recreated the `streamline-postgres` container with port mapping `5434:5432` using `docker compose up -d postgres`. Preserved the named volume `streamline_postgres_data` without dropping data or recreating tables.
+  - **Prisma:** Verified `prisma migrate status` reported `Database schema is up to date!` with `1 migration found in prisma/migrations`. Regenerated Prisma Client via `pnpm --filter @streamline/database run prisma:generate`.
+  - **API Service:** Verified that `apps/api` automatically reloaded configuration, resolved the Docker database on port 5434, and successfully processed `POST /auth/login` (HTTP 200 OK) and `GET /auth/me`.
+- **Validation:**
+  - Host psql check: `PGPASSWORD=postgres psql -h 127.0.0.1 -p 5434 -U postgres -d streamline` confirmed `PostgreSQL 16.15` and `current_database: streamline`.
+  - Prisma check: `pnpm --filter @streamline/database exec prisma migrate status` passed with 0 drift.
+  - Test suite: `pnpm test -- --force` passed all 31 tests across all 7 packages (13 in `@streamline/auth`, 12 in `@streamline/api`, 6 in `@streamline/web`).
+  - API Health & Login: `GET /health` returned 200 OK; `POST /auth/login` returned 200 OK with valid user data and `HttpOnly` cookies.
+  - Monorepo hygiene: `pnpm run typecheck`, `pnpm run lint`, and `pnpm run format:check` all passed with 0 errors.
+
 ### 2026-10-21 — Fix signup submit handler, native form fallback, and stale dev bundle
 
 - **Type:** Bug Fix / Testing / Frontend
