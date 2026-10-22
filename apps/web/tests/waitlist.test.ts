@@ -113,4 +113,3 @@ describe('Frontend Waitlist Submission & Validation Logic', () => {
     assert.equal(errorMessage, 'Something went wrong. Please try again.');
   });
 });
-

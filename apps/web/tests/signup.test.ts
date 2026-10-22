@@ -80,6 +80,114 @@ describe('Frontend Signup Submission & Validation Logic', () => {
     assert.equal(res.error, undefined);
   });
 
+  // Test current 3-field signup validation logic (Name, Email, Password)
+  function validateCurrentSignupFields(fields: { name: string; email: string; password: string }): {
+    nameError?: string;
+    emailError?: string;
+    passwordError?: string;
+    valid: boolean;
+  } {
+    const trimmedName = fields.name.trim();
+    const normalizedEmail = fields.email.trim().toLowerCase();
+    let valid = true;
+    let nameError: string | undefined;
+    let emailError: string | undefined;
+    let passwordError: string | undefined;
+
+    if (!trimmedName) {
+      nameError = 'Name is required.';
+      valid = false;
+    } else if (trimmedName.length < 2) {
+      nameError = 'Name must be at least 2 characters.';
+      valid = false;
+    }
+
+    if (!normalizedEmail) {
+      emailError = 'Email is required.';
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      emailError = 'Please enter a valid email address.';
+      valid = false;
+    }
+
+    if (!fields.password) {
+      passwordError = 'Password is required.';
+      valid = false;
+    } else if (fields.password.length < 8) {
+      passwordError = 'Password must be at least 8 characters long.';
+      valid = false;
+    }
+
+    return { valid, nameError, emailError, passwordError };
+  }
+
+  function deriveUsername(name: string, email: string): string {
+    let cleaned = name
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g, '');
+
+    if (cleaned.length < 3) {
+      const emailPrefix =
+        email
+          .split('@')[0]
+          ?.toLowerCase()
+          .replace(/[^a-z0-9_]/g, '') || '';
+      cleaned = (cleaned + '_' + emailPrefix).replace(/^_+|_+$/g, '');
+    }
+
+    if (cleaned.length < 3) {
+      cleaned = (cleaned + '_user').slice(0, 30);
+    }
+
+    return cleaned.slice(0, 30);
+  }
+
+  it('3-Field Form Validation — should validate name, email, and password independently', () => {
+    const emptyRes = validateCurrentSignupFields({ name: '', email: '', password: '' });
+    assert.equal(emptyRes.valid, false);
+    assert.equal(emptyRes.nameError, 'Name is required.');
+    assert.equal(emptyRes.emailError, 'Email is required.');
+    assert.equal(emptyRes.passwordError, 'Password is required.');
+
+    const invalidEmailRes = validateCurrentSignupFields({
+      name: 'Alex Rivera',
+      email: 'not-an-email',
+      password: 'StrongPassword123!'
+    });
+    assert.equal(invalidEmailRes.valid, false);
+    assert.equal(invalidEmailRes.emailError, 'Please enter a valid email address.');
+    assert.equal(invalidEmailRes.nameError, undefined);
+    assert.equal(invalidEmailRes.passwordError, undefined);
+
+    const shortPassRes = validateCurrentSignupFields({
+      name: 'Alex Rivera',
+      email: 'alex@streamline.live',
+      password: 'short'
+    });
+    assert.equal(shortPassRes.valid, false);
+    assert.equal(shortPassRes.passwordError, 'Password must be at least 8 characters long.');
+
+    const validRes = validateCurrentSignupFields({
+      name: 'Alex Rivera',
+      email: 'alex@streamline.live',
+      password: 'StrongPassword123!'
+    });
+    assert.equal(validRes.valid, true);
+    assert.equal(validRes.nameError, undefined);
+    assert.equal(validRes.emailError, undefined);
+    assert.equal(validRes.passwordError, undefined);
+  });
+
+  it('deriveUsername helper — should format names into valid API usernames', () => {
+    assert.equal(deriveUsername('Alex Rivera', 'alex@streamline.live'), 'alex_rivera');
+    assert.equal(deriveUsername('creator_99', 'user@streamline.live'), 'creator_99');
+    const shortDerive = deriveUsername('Al', 'capone@streamline.live');
+    assert.ok(shortDerive.length >= 3 && shortDerive.length <= 30);
+    assert.match(shortDerive, /^[a-zA-Z0-9_]+$/);
+  });
+
   it('API Client — should successfully submit signup to live API', async () => {
     const uniqueId = Date.now();
     const result = await api.auth.signup({
