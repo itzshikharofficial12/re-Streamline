@@ -23,3 +23,21 @@ export interface ApiResponse<T = unknown> {
   };
   meta?: Record<string, unknown>;
 }
+
+/**
+ * Safe User Profile (never includes password hashes or internal secrets)
+ */
+export interface SafeUser {
+  id: string;
+  email: string;
+  username: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Auth Session Response
+ */
+export interface AuthResponse {
+  user: SafeUser;
+}

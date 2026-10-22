@@ -48,17 +48,17 @@ The project is designed around the engineering challenges behind real streaming 
 
 StreamLine is being built to demonstrate a production-quality streaming architecture that can evolve toward the scale described in the project requirements.
 
-| Area | Target direction |
-|---|---|
-| Registered users | 100,000+ |
-| Creators | 10,000+ |
-| Simultaneous live streams | 500+ |
-| Concurrent viewers | 50,000+ |
-| Viewers per stream | 10,000+ |
-| Chat | Millions of messages |
-| Video processing | Thousands of segments/minute |
-| Analytics | Millions of viewing events |
-| Delivery | Real-time |
+| Area                      | Target direction             |
+| ------------------------- | ---------------------------- |
+| Registered users          | 100,000+                     |
+| Creators                  | 10,000+                      |
+| Simultaneous live streams | 500+                         |
+| Concurrent viewers        | 50,000+                      |
+| Viewers per stream        | 10,000+                      |
+| Chat                      | Millions of messages         |
+| Video processing          | Thousands of segments/minute |
+| Analytics                 | Millions of viewing events   |
+| Delivery                  | Real-time                    |
 
 > These are **engineering targets from the project PRD**, not claims about the current system's capacity.
 
@@ -126,21 +126,21 @@ Browser Creator Studio
 
 ## Main Components
 
-| Component | Responsibility |
-|---|---|
-| `apps/web` | Next.js web application, browser Creator Studio (`getUserMedia`), viewer experience (`hls.js`), creator dashboard |
-| `apps/api` | Core API, signaling negotiation, and application/domain logic |
-| `services/media/ingest` | WebRTC stream ingestion and MediaMTX routing (optional RTMP) |
-| `services/media/transcoder` | FFmpeg processing and multi-quality HLS transcoding when required |
-| `services/media/recorder` | Recording and VOD processing |
-| `services/realtime` | Socket.io, WebSockets, chat and presence |
-| `services/analytics` | Viewing and engagement analytics |
-| `packages/database` | Prisma schema/client and database access |
-| `packages/auth` | Authentication and authorization |
-| `packages/types` | Shared TypeScript contracts |
-| `packages/validation` | Shared request/data validation |
-| `packages/ui` | Shared frontend UI components |
-| `infrastructure` | PostgreSQL, Redis, MinIO, MediaMTX, FFmpeg and deployment infrastructure |
+| Component                   | Responsibility                                                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `apps/web`                  | Next.js web application, browser Creator Studio (`getUserMedia`), viewer experience (`hls.js`), creator dashboard |
+| `apps/api`                  | Core API, signaling negotiation, and application/domain logic                                                     |
+| `services/media/ingest`     | WebRTC stream ingestion and MediaMTX routing (optional RTMP)                                                      |
+| `services/media/transcoder` | FFmpeg processing and multi-quality HLS transcoding when required                                                 |
+| `services/media/recorder`   | Recording and VOD processing                                                                                      |
+| `services/realtime`         | Socket.io, WebSockets, chat and presence                                                                          |
+| `services/analytics`        | Viewing and engagement analytics                                                                                  |
+| `packages/database`         | Prisma schema/client and database access                                                                          |
+| `packages/auth`             | Authentication and authorization                                                                                  |
+| `packages/types`            | Shared TypeScript contracts                                                                                       |
+| `packages/validation`       | Shared request/data validation                                                                                    |
+| `packages/ui`               | Shared frontend UI components                                                                                     |
+| `infrastructure`            | PostgreSQL, Redis, MinIO, MediaMTX, FFmpeg and deployment infrastructure                                          |
 
 ---
 
@@ -186,7 +186,7 @@ The initial architecture is built around:
 
 ---
 
-##  Repository Structure
+## Repository Structure
 
 ```text
 streamline/
@@ -341,12 +341,12 @@ The final development command will be documented here once the application scaff
 
 StreamLine is initially being developed by a four-developer team.
 
-| Area | Primary ownership |
-|---|---|
-| Core platform / backend / database | Developer 1 |
-| Frontend / UI / viewer experience | Developer 2 |
-| Media infrastructure / FFmpeg / MediaMTX | Developer 3 |
-| Realtime / Redis / analytics / load testing | Developer 4 |
+| Area                                        | Primary ownership |
+| ------------------------------------------- | ----------------- |
+| Core platform / backend / database          | Developer 1       |
+| Frontend / UI / viewer experience           | Developer 2       |
+| Media infrastructure / FFmpeg / MediaMTX    | Developer 3       |
+| Realtime / Redis / analytics / load testing | Developer 4       |
 
 Ownership indicates the primary maintainer of an area; it does **not** prevent other contributors from making necessary changes.
 
@@ -358,20 +358,20 @@ The detailed task breakdown and phase plan will live in the project documentatio
 
 The repository treats documentation as part of the engineering deliverable.
 
-| Document | Purpose |
-|---|---|
-| [`AGENTS.md`](AGENTS.md) | Instructions and rules for AI coding agents |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Human contributor workflow |
-| [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) | System architecture and boundaries |
-| [`docs/architecture/SYSTEM_FLOWS.md`](docs/architecture/SYSTEM_FLOWS.md) | System and data flows |
-| [`docs/development/DEVELOPMENT.md`](docs/development/DEVELOPMENT.md) | Development practices |
-| [`docs/development/GIT_WORKFLOW.md`](docs/development/GIT_WORKFLOW.md) | Branches, commits and PRs |
-| [`docs/development/CHANGELOG.md`](docs/development/CHANGELOG.md) | Permanent development change log |
-| [`docs/api/API_GUIDELINES.md`](docs/api/API_GUIDELINES.md) | API conventions |
-| [`docs/database/DATABASE.md`](docs/database/DATABASE.md) | Database guidelines |
-| [`docs/streaming/STREAMING.md`](docs/streaming/STREAMING.md) | Media and streaming architecture |
-| [`docs/realtime/REALTIME.md`](docs/realtime/REALTIME.md) | WebSocket/chat/realtime architecture |
-| [`docs/decisions/ADR_TEMPLATE.md`](docs/decisions/ADR_TEMPLATE.md) | Architecture Decision Record template |
+| Document                                                                 | Purpose                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------- |
+| [`AGENTS.md`](AGENTS.md)                                                 | Instructions and rules for AI coding agents |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)                                     | Human contributor workflow                  |
+| [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) | System architecture and boundaries          |
+| [`docs/architecture/SYSTEM_FLOWS.md`](docs/architecture/SYSTEM_FLOWS.md) | System and data flows                       |
+| [`docs/development/DEVELOPMENT.md`](docs/development/DEVELOPMENT.md)     | Development practices                       |
+| [`docs/development/GIT_WORKFLOW.md`](docs/development/GIT_WORKFLOW.md)   | Branches, commits and PRs                   |
+| [`docs/development/CHANGELOG.md`](docs/development/CHANGELOG.md)         | Permanent development change log            |
+| [`docs/api/API_GUIDELINES.md`](docs/api/API_GUIDELINES.md)               | API conventions                             |
+| [`docs/database/DATABASE.md`](docs/database/DATABASE.md)                 | Database guidelines                         |
+| [`docs/streaming/STREAMING.md`](docs/streaming/STREAMING.md)             | Media and streaming architecture            |
+| [`docs/realtime/REALTIME.md`](docs/realtime/REALTIME.md)                 | WebSocket/chat/realtime architecture        |
+| [`docs/decisions/ADR_TEMPLATE.md`](docs/decisions/ADR_TEMPLATE.md)       | Architecture Decision Record template       |
 
 ---
 
@@ -583,7 +583,7 @@ StreamLine succeeds when:
 
 ---
 
-##  License
+## License
 
 License: **TBD**
 
