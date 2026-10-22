@@ -37,3 +37,16 @@ model RefreshSession {
   @@index([hashedToken])
   @@map("refresh_sessions")
 }
+
+model WaitlistEntry {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  status    String   @default("pending")
+  source    String   @default("homepage")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@map("waitlist_entries")
+}
+

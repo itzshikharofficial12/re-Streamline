@@ -1,5 +1,5 @@
-import type { SafeUser, AuthResponse } from '@streamline/types';
-import type { SignupInput, LoginInput } from '@streamline/validation';
+import type { SafeUser, AuthResponse, WaitlistResponse } from '@streamline/types';
+import type { SignupInput, LoginInput, WaitlistInput } from '@streamline/validation';
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -144,6 +144,13 @@ export const api = {
     getMe: async (): Promise<SafeUser> => {
       const res = await api.get<{ success: true; data: { user: SafeUser } }>('/auth/me');
       return res.data.user;
+    }
+  },
+
+  waitlist: {
+    join: async (data: WaitlistInput): Promise<WaitlistResponse> => {
+      const res = await api.post<{ success: true; data: WaitlistResponse }>('/waitlist', data);
+      return res.data;
     }
   }
 };

@@ -1,171 +1,35 @@
-'use client';
+import React from 'react';
+import type { Metadata } from 'next';
+import { Header } from '../components/Header';
+import { Hero } from '../components/Hero';
+import { Footer } from '../components/Footer';
+import { SpaceBackground } from '../components/SpaceBackground';
 
-import { useState } from 'react';
-import type { HealthResponse } from '@streamline/types';
+export const metadata: Metadata = {
+  title: 'Streamline — The future of streaming is being built',
+  description:
+    'A new way to stream, connect, and build your community — directly from your browser. We are working hard to bring it to you soon.',
+  icons: {
+    icon: '/favicon.svg'
+  }
+};
 
 export default function HomePage() {
-  const [health, setHealth] = useState<HealthResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const checkApiHealth = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const res = await fetch(`${apiUrl}/health`);
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-      const data: HealthResponse = await res.json();
-      setHealth(data);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to reach API');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <main>
-      <header>
-        <h1>Streamline — Development Foundation</h1>
-        <p>Browser-based live video streaming platform monorepo</p>
-      </header>
+    <div className="landing-viewport">
+      {/* Cinematic space background with subtle stars and planetary horizon */}
+      <SpaceBackground />
 
-      <section className="card">
-        <h2>Milestone Status</h2>
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <span className="badge">Milestone 1 — Monorepo Foundation</span>
-          <span className="badge">Milestone 2 — Secure JWT Authentication</span>
-        </div>
-        <dl>
-          <dt>Frontend App</dt>
-          <dd>Next.js 14 / React 18 (@streamline/web)</dd>
-          <dt>Backend API</dt>
-          <dd>Node.js / Express (@streamline/api)</dd>
-          <dt>Authentication</dt>
-          <dd>Argon2id + JWT + Opaque Refresh Session</dd>
-          <dt>Shared Packages</dt>
-          <dd>@streamline/auth, @streamline/database, @streamline/validation, @streamline/types</dd>
-          <dt>Orchestration</dt>
-          <dd>pnpm workspaces + Turborepo</dd>
-        </dl>
-      </section>
+      {/* Primary Navigation Header */}
+      <Header />
 
-      <section className="card">
-        <h2>Authentication Experience (Milestone 2)</h2>
-        <p style={{ marginBottom: '1rem' }}>
-          Test user registration, secure login, cookie-based sessions, and the authenticated
-          dashboard.
-        </p>
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <a
-            href="/signup"
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#38bdf8',
-              color: '#0b1020',
-              borderRadius: '4px',
-              fontWeight: 600,
-              textDecoration: 'none'
-            }}
-          >
-            Create Account (/signup)
-          </a>
-          <a
-            href="/login"
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: 'transparent',
-              color: '#f0f4fc',
-              border: '1px solid #233152',
-              borderRadius: '4px',
-              fontWeight: 500,
-              textDecoration: 'none'
-            }}
-          >
-            Sign In (/login)
-          </a>
-          <a
-            href="/dashboard"
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: 'transparent',
-              color: '#8ea1c0',
-              border: '1px solid #233152',
-              borderRadius: '4px',
-              fontWeight: 500,
-              textDecoration: 'none'
-            }}
-          >
-            View Dashboard (/dashboard)
-          </a>
-        </div>
-      </section>
+      {/* Hero with status pill, headline, copy, and waitlist area */}
+      <main className="landing-main">
+        <Hero />
+      </main>
 
-      <section className="card">
-        <h2>API Connectivity Verification</h2>
-        <p style={{ marginBottom: '1rem' }}>
-          Test the connection between this web client and the backend API service.
-        </p>
-
-        <button
-          onClick={checkApiHealth}
-          disabled={loading}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#38bdf8',
-            color: '#0b1020',
-            border: 'none',
-            borderRadius: '4px',
-            fontWeight: 600,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            marginBottom: '1rem'
-          }}
-        >
-          {loading ? 'Checking...' : 'Check API Health (GET /health)'}
-        </button>
-
-        {health && (
-          <div style={{ marginTop: '0.5rem' }}>
-            <p style={{ color: '#34d399', fontWeight: 600, marginBottom: '0.5rem' }}>
-              API Status: {health.status.toUpperCase()}
-            </p>
-            <pre
-              style={{
-                background: '#0b1020',
-                padding: '0.75rem',
-                borderRadius: '4px',
-                fontSize: '0.8125rem',
-                overflowX: 'auto'
-              }}
-            >
-              {JSON.stringify(health, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {error && (
-          <p style={{ color: '#f87171', marginTop: '0.5rem', fontFamily: 'var(--font-mono)' }}>
-            Error: {error}
-          </p>
-        )}
-      </section>
-
-      <section className="card">
-        <h2>Planned Pipelines (Upcoming Milestones)</h2>
-        <ul>
-          <li>
-            Browser Creator Studio media capture via <code>getUserMedia()</code>
-          </li>
-          <li>WebRTC publishing to MediaMTX gateway</li>
-          <li>FFmpeg adaptive bitrate HLS transcoding</li>
-          <li>
-            Viewer playback with <code>hls.js</code> and HTML5 video
-          </li>
-        </ul>
-      </section>
-    </main>
+      {/* Restrained Footer */}
+      <Footer />
+    </div>
   );
 }
